@@ -19,6 +19,7 @@ public:
 	float Rotation;
 	bool IsSolid;
 	bool Destroyed;
+	float animation_speed;	// time in seconds
 
 	//render state
 	Texture2D Sprite;
