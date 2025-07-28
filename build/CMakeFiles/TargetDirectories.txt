@@ -1,0 +1,3 @@
+/Users/ahbar/Desktop/2d-platformer/build/CMakeFiles/main.dir
+/Users/ahbar/Desktop/2d-platformer/build/CMakeFiles/edit_cache.dir
+/Users/ahbar/Desktop/2d-platformer/build/CMakeFiles/rebuild_cache.dir
