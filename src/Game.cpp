@@ -8,6 +8,7 @@ Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(),
 	//Empty for now 
 }
 
+const float animation_fps = 0.25;
 //Initial size of player
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
 //Initial velocity of player
@@ -20,7 +21,7 @@ const float  BALL_RADIUS = 12.5f;
 BallObject* Ball;
 
 // width x height 
-const glm::vec2 ANIM_PLAYER_SIZE(100.0f, 100.0f);
+const glm::vec2 ANIM_PLAYER_SIZE(200.0f, 200.0f);
 GameObject* AnimatedPlayer;
 
 //Particles
@@ -81,7 +82,7 @@ void Game::Init()
 	
 	// just render it at top left we dont care;
 	auto anim_player_pos = glm::vec2(1.0, 1.0); 	
-	AnimatedPlayer = new GameObject(anim_player_pos, ANIM_PLAYER_SIZE, ResourceManager::getAnimation("Player_Idle"));	
+	AnimatedPlayer = new GameObject(anim_player_pos, ANIM_PLAYER_SIZE, ResourceManager::getAnimation("Player_Idle"), animation_fps);	
 }
 
 void Game::Render(float dt) {

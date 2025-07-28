@@ -20,6 +20,7 @@ public:
 	bool IsSolid;
 	bool Destroyed;
 	float animation_speed;	// time in seconds
+	float time_since;		// time since last animation 
 
 	//render state
 	Texture2D Sprite;
@@ -28,7 +29,7 @@ public:
 	//constructor
 	GameObject();
 	GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec3 color=glm::vec3(1.0f), glm::vec2 velocity=glm::vec2(0.0f, 0.0f));
-	GameObject(glm::vec2 pos, glm::vec2 size, std::vector<Texture2D> sprites, glm::vec3 color=glm::vec3(1.0f), glm::vec2 velocity=glm::vec2(0.0f, 0.0f));
+	GameObject(glm::vec2 pos, glm::vec2 size, std::vector<Texture2D> sprites, float animation_speed, glm::vec3 color=glm::vec3(1.0f), glm::vec2 velocity=glm::vec2(0.0f, 0.0f));
 
 	//draw sprite
 	virtual void Draw(SpriteRenderer& Renderer);
