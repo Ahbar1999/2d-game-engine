@@ -1,5 +1,7 @@
 #include "Game.h"
+#include "GameObject.h"
 #include "ParticleGenerator.h"
+#include "Character.h"
 
 SpriteRenderer* Renderer;
 
@@ -8,12 +10,12 @@ Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(),
 	//Empty for now 
 }
 
-const float animation_fps = 0.25;
+const float animation_fps = 0.1;
 //Initial size of player
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
 //Initial velocity of player
 const float PLAYER_VELOCTIY(500.0f);
-GameObject* Player;
+Character* Player;
 
 //Initialize variables of Ball object
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
@@ -22,13 +24,12 @@ BallObject* Ball;
 
 // width x height 
 const glm::vec2 ANIM_PLAYER_SIZE(200.0f, 200.0f);
-GameObject* AnimatedPlayer;
+// GameObject* AnimatedPlayer;
 
 //Particles
 ParticleGenerator* Particles;
 
-void Game::Init()
-{
+void Game::Init() {
 	ResourceManager::LoadShader("vertex.shader", "fragment.shader", nullptr, "sprite");
 	ResourceManager::LoadShader("vParticles.shader", "fParticles.shader", nullptr, "particle");
 	//configure shaders
@@ -53,7 +54,6 @@ void Game::Init()
 	ResourceManager::LoadTexture("../Assets/paddle.png", true, "paddle");
 	ResourceManager::LoadTexture("../Assets/awesomeface.png", true, "face");
 	ResourceManager::LoadTexture("../Assets/particle.png", true, "particle");
-	ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Idle.png", 6, true, "Player_Idle");
 
 	//load levels
 	GameLevel one;
@@ -72,17 +72,15 @@ void Game::Init()
 	this->Level = 0;
 
 	glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
-	Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
-
-
+	Player = new Character(playerPos, PLAYER_SIZE,  0.2f);
 	glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
 	Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("face"));
 	
 	Particles = new ParticleGenerator(ResourceManager::getShader("particle"), ResourceManager::getTexture("particle"), 500);
 	
 	// just render it at top left we dont care;
-	auto anim_player_pos = glm::vec2(1.0, 1.0); 	
-	AnimatedPlayer = new GameObject(anim_player_pos, ANIM_PLAYER_SIZE, ResourceManager::getAnimation("Player_Idle"), animation_fps);	
+	// auto anim_player_pos = glm::vec2(1.0, 1.0); 	
+	// AnimatedPlayer = new GameObject(anim_player_pos, ANIM_PLAYER_SIZE, ResourceManager::getAnimation("Player_Idle"), animation_fps);	
 }
 
 void Game::Render(float dt) {
@@ -95,36 +93,30 @@ void Game::Render(float dt) {
 	//draw level
 	this->Levels[this->Level].Draw(*Renderer);
 	//Draw player
-	Player->Draw(*Renderer);
+	// Player->Draw(*Renderer);
 	//Draw particles
 	Particles->Draw();
 	// Particles->DrawUsingRenderer(*Renderer);
 	//Draw ball, in that order
 	Ball->Draw(*Renderer);
 
-	AnimatedPlayer->Animate(*Renderer, dt);	
+	Player->Animate(*Renderer, dt);	
 }
 
-void Game::ProcessInput(float dt)
-{
-	if (this->State == GAME_ACTIVE)
-	{
+void Game::ProcessInput(float dt) {
+	if (this->State == GAME_ACTIVE) {
 		float velocity = PLAYER_VELOCTIY * dt;
 		//move paddle
-		if (this->Keys[GLFW_KEY_A])
-		{
-			if (Player->Position.x >= 0.0f)
-			{
+		if (this->Keys[GLFW_KEY_A]) {
+			if (Player->Position.x >= 0.0f) {
 				Player->Position.x -= velocity;
 				if (Ball->Stuck)
 					Ball->Position.x -= velocity;
 			}
 
 		}
-		if (this->Keys[GLFW_KEY_D])
-		{
-			if (Player->Position.x < this->Width - Player->Size.x)
-			{
+		if (this->Keys[GLFW_KEY_D]) {
+			if (Player->Position.x < this->Width - Player->Size.x) {
 				Player->Position.x += velocity;
 				if (Ball->Stuck)
 					Ball->Position.x += velocity;
@@ -135,8 +127,7 @@ void Game::ProcessInput(float dt)
 	}
 }
 
-bool Game::CheckCollision(GameObject& one, GameObject& two)
-{
+bool Game::CheckCollision(GameObject& one, GameObject& two) {
 	//collision along x axis											//this is to check the second box hasnt crossed on the left side				
 	bool CollisionX = (one.Position.x + one.Size.x >= two.Position.x) && (two.Position.x + two.Size.x >= one.Position.x);
 	
@@ -241,6 +232,7 @@ void Game::DoCollisions()
 			}
 		}
 	}
+
 	//Collision between the paddle and the ball
 	Collision result = CheckCollision(*Ball, *Player);
 	if (!Ball->Stuck && std::get<0>(result))
@@ -271,8 +263,7 @@ void Game::Update(float dt) {
 	}
 }
 
-void Game::ResetLevel()
-{
+void Game::ResetLevel() {
 	if (this->Level == 0)
 		this->Levels[0].Load("Assets/Levels/standard.lvl.txt", this->Width, this->Height / 2);
 	else if (this->Level == 1)
@@ -284,8 +275,7 @@ void Game::ResetLevel()
 
 }
 
-void Game::ResetPlayer()
-{
+void Game::ResetPlayer() {
 	//reset ball player stats
 	Player->Size = PLAYER_SIZE;
 	Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);

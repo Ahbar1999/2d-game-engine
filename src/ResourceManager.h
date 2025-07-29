@@ -30,7 +30,8 @@ public:
 	//retrieves  the shader object 
 	static Texture2D getTexture(std::string name);
 
-	static std::vector<Texture2D> getAnimation(std::string name);
+	// return a reference to the textures of an animations 
+	static std::vector<Texture2D>* getAnimation(std::string name);
 	//de allocates all the loaded resources, memory and shit allocated in the process 
 	static void Clear();
 

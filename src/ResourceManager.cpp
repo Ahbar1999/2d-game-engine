@@ -39,8 +39,8 @@ Texture2D ResourceManager::getTexture(std::string name) {
 	return Textures[name];
 }
 
-std::vector<Texture2D> ResourceManager::getAnimation(std::string name) {
-    return Animations[name]; 
+std::vector<Texture2D>* ResourceManager::getAnimation(std::string name) {
+    return &Animations[name]; 
 }
 
 void ResourceManager::Clear()
@@ -124,16 +124,16 @@ std::vector<Texture2D> ResourceManager::loadAnimationFromFile(const char* file, 
             texture.Image_Format = GL_RGBA;
         }
 
-        for (int y = 0; y < frame_height; y++) {
-            for (int x = 0; x < frame_width; x++) {
-                for (int c = 0; c < nrChannels; c++) {
+        for (uint32_t y = 0; y < frame_height; y++) {
+            for (uint32_t x = 0; x < frame_width; x++) {
+                for (uint32_t c = 0; c < nrChannels; c++) {
                     // Source calculation (in bytes):
                     // - y * width * nrChannels: skip to correct row
                     // - i * frame_width * nrChannels: offset to correct frame
                     // - x * nrChannels: offset to correct pixel in row  
                     // - c: offset to correct channel
-                    int src_index = (y * width + i * frame_width + x) * nrChannels + c;
-                    int dst_index = (y * frame_width + x) * nrChannels + c;
+                    uint32_t src_index = (y * width + i * frame_width + x) * nrChannels + c;
+                    uint32_t dst_index = (y * frame_width + x) * nrChannels + c;
                     frame_data[dst_index] = data[src_index];
                 }
             }
