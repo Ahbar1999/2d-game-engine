@@ -12,17 +12,14 @@
 #include "BallObject.h"
 #include <tuple>
 
-
 //You know the drill
-enum GameState
-{
+enum GameState {
 	GAME_ACTIVE,
 	GAME_MENU,
 	GAME_WIN
 };
 
-enum Direction
-{
+enum Direction {
 	UP,
 	RIGHT,
 	DOWN,
@@ -31,13 +28,13 @@ enum Direction
 
 typedef std::tuple<bool, Direction, glm::vec2> Collision;
 
-class Game
-{
+class Game {
 public:
 	//game state
 	GameState State;
 	bool Keys[1024];
 	unsigned int Width, Height;
+	uint16_t  last_key;
 
 	//constructor/destructors
 	Game(unsigned int width, unsigned int height);

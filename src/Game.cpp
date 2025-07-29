@@ -5,14 +5,14 @@
 
 SpriteRenderer* Renderer;
 
-Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(), Width(Width), Height(Height)
-{
+Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(), Width(Width), Height(Height), last_key(0) {
 	//Empty for now 
 }
 
-const float animation_fps = 0.1;
+// 24 frames per second
+const float animation_fps = 1.0 / 24.0;
 //Initial size of player
-const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
+const glm::vec2 PLAYER_SIZE(200.0f, 200.0f);
 //Initial velocity of player
 const float PLAYER_VELOCTIY(500.0f);
 Character* Player;
@@ -72,7 +72,7 @@ void Game::Init() {
 	this->Level = 0;
 
 	glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
-	Player = new Character(playerPos, PLAYER_SIZE,  0.2f);
+	Player = new Character(playerPos, PLAYER_SIZE,  animation_fps);
 	glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
 	Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("face"));
 	
@@ -104,6 +104,8 @@ void Game::Render(float dt) {
 }
 
 void Game::ProcessInput(float dt) {
+	// reset state
+	// Player->state = Character::CharacterState::IDLE; 
 	if (this->State == GAME_ACTIVE) {
 		float velocity = PLAYER_VELOCTIY * dt;
 		//move paddle
@@ -114,16 +116,39 @@ void Game::ProcessInput(float dt) {
 					Ball->Position.x -= velocity;
 			}
 
-		}
-		if (this->Keys[GLFW_KEY_D]) {
+			if (this->last_key != GLFW_KEY_A) {
+				Player->change_state(Character::CharacterState::WALKING);
+				// if (this->Keys[GLFW_KEY_LEFT_SHIFT]) {
+				// 	Player->change_state(Character::CharacterState::RUNNING);
+				// } 
+			}
+			this->last_key = GLFW_KEY_A;
+		} else if (this->Keys[GLFW_KEY_D]) {
 			if (Player->Position.x < this->Width - Player->Size.x) {
 				Player->Position.x += velocity;
 				if (Ball->Stuck)
 					Ball->Position.x += velocity;
 			}
-		}
-		if (this->Keys[GLFW_KEY_SPACE])
+
+			if (this->last_key != GLFW_KEY_D) {
+				Player->change_state(Character::CharacterState::WALKING);
+				// if (this->Keys[GLFW_KEY_LEFT_SHIFT]) {
+				// 	Player->change_state(Character::CharacterState::RUNNING);
+				// }
+			}
+			this->last_key = GLFW_KEY_D;
+		} else if (this->Keys[GLFW_KEY_SPACE]) {
 			Ball->Stuck = false;
+			if (this->last_key != GLFW_KEY_SPACE) {
+				Player->change_state(Character::CharacterState::ATTACK1);
+			}
+			this->last_key = GLFW_KEY_SPACE;
+		} else {
+			if (this->last_key != (1 << 16) - 1) {
+				Player->change_state(Character::CharacterState::IDLE);
+			}
+			this->last_key= (1 << 16) - 1;
+		}
 	}
 }
 
@@ -261,6 +286,7 @@ void Game::Update(float dt) {
 		this->ResetLevel();
 		this->ResetPlayer();
 	}
+	// Player->state = Character::CharacterState::IDLE;
 }
 
 void Game::ResetLevel() {

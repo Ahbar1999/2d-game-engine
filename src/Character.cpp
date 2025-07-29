@@ -32,3 +32,8 @@ void Character::Animate(SpriteRenderer& Renderer, float dt) {
 	// std::cout << "time since: " << this->time_since << std::endl;
 	Renderer.DrawSprite((*this->animations[this->state])[this->frame_i], this->Position, this->Size, this->Rotation, this->Color);
 }
+
+void Character::change_state(CharacterState new_state) {
+    this->state = new_state;
+    this->frame_i =0;
+}
