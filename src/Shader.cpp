@@ -101,8 +101,7 @@ void Shader::SetMatrix4(const char* name, const glm::mat4& matrix, bool useShade
 }
 
 
-void Shader::checkCompileErrors(unsigned int object, std::string type)
-{
+void Shader::checkCompileErrors(unsigned int object, std::string type) {
     int success;
     char infoLog[1024];
     if (type != "PROGRAM")

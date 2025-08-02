@@ -6,6 +6,7 @@
 SpriteRenderer* Renderer;
 
 Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(), Width(Width), Height(Height), last_key(0) {
+
 	//Empty for now 
 }
 
@@ -30,17 +31,30 @@ const glm::vec2 ANIM_PLAYER_SIZE(200.0f, 200.0f);
 ParticleGenerator* Particles;
 
 void Game::Init() {
+
 	ResourceManager::LoadShader("vertex.shader", "fragment.shader", nullptr, "sprite");
 	ResourceManager::LoadShader("vParticles.shader", "fParticles.shader", nullptr, "particle");
 	//configure shaders
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
+	// glm::mat4 
+	// std::cout << "aspect ratio" << 1.0 * this->Width / this->Height << std::endl;
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f * this->Width / this->Height, 0.1f, 2.0f);
+	// glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
+	
+	// this->mouse_x = 1.0 * Width / 2.0;	
+	// this->mouse_y = 1.0 * Height / 2.0;
+	this->camera = Camera();
+
+	// this->camera.rotate(10, 0, 0);
 
 	//Setting sprite shader uniform variables
 	ResourceManager::getShader("sprite").Use().SetInteger("image", 0);
 	ResourceManager::getShader("sprite").SetMatrix4("projection", projection);
+	ResourceManager::getShader("sprite").SetMatrix4("view", camera.getViewMat());
+	// ResourceManager::getShader("sprite").Use().SetMatrix4("view", camera.getViewMat());
 
 	//Setting Particle shader uniform variables
 	ResourceManager::getShader("particle").Use().SetMatrix4("projection", projection);
+	ResourceManager::getShader("particle").SetMatrix4("view", camera.getViewMat());
 	ResourceManager::getShader("particle").SetInteger("sprite", 0);
 	//ResourceManager::getShader("particle").SetVector2f("offset", glm::vec2(0.5, 0));
 	//ResourceManager::getShader("particle").SetVector4f("color", glm::vec4(1));
@@ -84,28 +98,29 @@ void Game::Init() {
 }
 
 void Game::Render(float dt) {
-
 	if (this->State == GAME_ACTIVE) {
 		//draw background
-		Renderer->DrawSprite(ResourceManager::getTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+		// Renderer->DrawSprite(ResourceManager::getTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+		Renderer->DrawDebug();
 	}
 
 	//draw level
-	this->Levels[this->Level].Draw(*Renderer);
+	// this->Levels[this->Level].Draw(*Renderer);
 	//Draw player
 	// Player->Draw(*Renderer);
 	//Draw particles
-	Particles->Draw();
+	// Particles->Draw();
 	// Particles->DrawUsingRenderer(*Renderer);
 	//Draw ball, in that order
-	Ball->Draw(*Renderer);
+	// Ball->Draw(*Renderer);
 
-	Player->Animate(*Renderer, dt);	
+	// Player->Animate(*Renderer, dt);	
 }
 
 void Game::ProcessInput(float dt) {
+	// std::cout << "mouse: " <<  this->mouse_x << " " << this->mouse_y << std::endl;
+	this->camera.rotate(this->mouse_dx, this->mouse_dy, dt);
 	// reset state
-	// Player->state = Character::CharacterState::IDLE; 
 	if (this->State == GAME_ACTIVE) {
 		float velocity = PLAYER_VELOCTIY * dt;
 		//move paddle
@@ -155,12 +170,10 @@ void Game::ProcessInput(float dt) {
 bool Game::CheckCollision(GameObject& one, GameObject& two) {
 	//collision along x axis											//this is to check the second box hasnt crossed on the left side				
 	bool CollisionX = (one.Position.x + one.Size.x >= two.Position.x) && (two.Position.x + two.Size.x >= one.Position.x);
-	
 	//collision along y axis
 	bool CollisionY = (one.Position.y + one.Size.y >= two.Position.y) && (two.Position.y + two.Size.y >= one.Position.y);
 	
 	return CollisionX && CollisionY;
-
 }
 
 Collision Game::CheckCollision(BallObject& one, GameObject& two) {
@@ -216,12 +229,9 @@ Direction Game::VectorDirection(glm::vec2 target)
 }
 
 
-void Game::DoCollisions()
-{
-	for (GameObject& box : this->Levels[this->Level].Bricks)
-	{
-		if (!box.Destroyed)
-		{
+void Game::DoCollisions() {
+	for (GameObject& box : this->Levels[this->Level].Bricks) {
+		if (!box.Destroyed) {
 			Collision collision = CheckCollision(*Ball, box);	
 
 			if (std::get<0>(collision)) //if collision is true 
@@ -277,6 +287,10 @@ void Game::DoCollisions()
 }
 
 void Game::Update(float dt) {
+	// update the view matrix in the sprite shader
+	ResourceManager::getShader("sprite").Use().SetMatrix4("view", camera.getViewMat());
+	ResourceManager::getShader("particle").Use().SetMatrix4("view", camera.getViewMat());
+	
 	Ball->Move(dt, this->Width);
 	this->DoCollisions();
 

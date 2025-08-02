@@ -11,6 +11,7 @@
 #include "GameLevel.h"
 #include "BallObject.h"
 #include <tuple>
+#include "Camera.h"
 
 //You know the drill
 enum GameState {
@@ -35,7 +36,9 @@ public:
 	bool Keys[1024];
 	unsigned int Width, Height;
 	uint16_t  last_key;
-
+	Camera camera;
+	double mouse_x, mouse_dx;
+	double mouse_y, mouse_dy;
 	//constructor/destructors
 	Game(unsigned int width, unsigned int height);
 	//~Game();

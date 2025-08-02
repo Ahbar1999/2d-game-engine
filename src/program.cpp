@@ -8,13 +8,14 @@
 // GLFW function declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void mouse_cursor_callback(GLFWwindow* window , double xpos, double ypos);
 
 // The Width of the screen
 const unsigned int SCREEN_WIDTH = 800;
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 600;
 
-Game Breakout(SCREEN_WIDTH, SCREEN_HEIGHT);
+Game THEGame(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 int main(int argc, char* argv[])
 {
@@ -37,10 +38,13 @@ int main(int argc, char* argv[])
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
+    
+    glfwSetCursorPosCallback(window, mouse_cursor_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
     // OpenGL configuration
     // --------------------
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -49,13 +53,14 @@ int main(int argc, char* argv[])
 
     // initialize game
     // ---------------
-    Breakout.Init();
+    THEGame.Init();
 
     // deltaTime variables
     // -------------------
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
+    // glfwSetCursorPos(window, 1.0 * SCREEN_HEIGHT / 2.0, 1.0 * SCREEN_WIDTH / 2.0);
     while (!glfwWindowShouldClose(window))
     {
         // calculate delta time
@@ -67,17 +72,17 @@ int main(int argc, char* argv[])
 
         // manage user input
         // -----------------
-        Breakout.ProcessInput(deltaTime);
+        THEGame.ProcessInput(deltaTime);
 
         // update game state
         // -----------------
-        Breakout.Update(deltaTime);
+        THEGame.Update(deltaTime);
 
         // render
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        Breakout.Render(deltaTime);
+        THEGame.Render(deltaTime);
 
         glfwSwapBuffers(window);
     }
@@ -90,18 +95,30 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     // when a user presses the escape key, we set the WindowShouldClose property to true, closing the application
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (key >= 0 && key < 1024)
-    {
+    if (key >= 0 && key < 1024) {
         if (action == GLFW_PRESS)
-            Breakout.Keys[key] = true;
+            THEGame.Keys[key] = true;
         else if (action == GLFW_RELEASE)
-            Breakout.Keys[key] = false;
+            THEGame.Keys[key] = false;
     }
+}
+
+void mouse_cursor_callback(GLFWwindow* window , double xpos, double ypos) {
+    static bool first_call = 1;
+    if (first_call) {
+        first_call =0;
+        THEGame.mouse_x = xpos;
+        THEGame.mouse_y = ypos;  
+    } 
+    THEGame.mouse_dx = THEGame.mouse_x - xpos;
+    THEGame.mouse_dy = THEGame.mouse_y - ypos;
+    // std::cout << THEGame.mouse_dx << ", " << THEGame.mouse_dy << std::endl;
+    THEGame.mouse_x = xpos;
+    THEGame.mouse_y = ypos;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

@@ -32,8 +32,7 @@ void ParticleGenerator::DrawUsingRenderer(SpriteRenderer& Renderer) {
 	this->shader.Use();
 	for(const Particle& particle: this->Particles)
 	{ 
-		if (particle.Life > 0)
-		{
+		if (particle.Life > 0) {
 			this->shader.SetVector2f("offset", particle.Position);
 			this->shader.SetVector4f("color", particle.Color);
 			this->texture.Bind();
@@ -69,8 +68,7 @@ void ParticleGenerator::Draw() {
 void ParticleGenerator::init() {
 	//set up mesh and attributes properties
 	unsigned int VBO;
-	float particle_quad[] =
-	{
+	float particle_quad[] = {
 		0.0f, 1.0f, 0.0f, 1.0f,
 		1.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 0.0f,
@@ -107,8 +105,7 @@ void ParticleGenerator::init() {
 //stores the index of the last particle used (for quick access to next dead particle)
 unsigned int lastUsedParticle = 0;
 //I dont understand how does this work
-unsigned int ParticleGenerator::firstUnusedParticle()
-{
+unsigned int ParticleGenerator::firstUnusedParticle() {
 	//first search from last used particle, this will usually return almost instantly
 	for(unsigned int i = lastUsedParticle; i < this->amount; ++i)
 	{
