@@ -37,7 +37,7 @@ void Game::Init() {
 	//configure shaders
 	// glm::mat4 
 	// std::cout << "aspect ratio" << 1.0 * this->Width / this->Height << std::endl;
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f * this->Width / this->Height, 0.1f, 2.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f * this->Width / this->Height, 0.1f, 10.0f);
 	// glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
 	
 	// this->mouse_x = 1.0 * Width / 2.0;	
@@ -158,6 +158,14 @@ void Game::ProcessInput(float dt) {
 				Player->change_state(Character::CharacterState::ATTACK1);
 			}
 			this->last_key = GLFW_KEY_SPACE;
+		} else if (this->Keys[GLFW_KEY_UP]) {
+			this->camera.move_forwards(velocity * dt);
+		} else if (this->Keys[GLFW_KEY_DOWN]) {
+			this->camera.move_backwards(velocity * dt);
+		} else if (this->Keys[GLFW_KEY_LEFT]) {
+			this->camera.move_left(velocity * dt);
+		} else if (this->Keys[GLFW_KEY_RIGHT]) {
+			this->camera.move_right(velocity * dt);
 		} else {
 			if (this->last_key != (1 << 16) - 1) {
 				Player->change_state(Character::CharacterState::IDLE);

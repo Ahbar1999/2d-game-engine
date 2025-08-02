@@ -8,6 +8,7 @@
 // view_dir to negative z axis, i.e. into the screen
 // up vector to +y axis; 
 
+// view+ eye = look at origin
 Camera::Camera() {
     this->eye = glm::vec3(0.0f, 0.0f, 1.0f);
     this->view_dir = glm::vec3(0.0f, 0.0f, -1.0f);

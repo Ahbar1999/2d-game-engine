@@ -24,13 +24,13 @@ void SpriteRenderer::initRenderData()
 
     float vertices[] = {
         // pos      // tex
-        -0.5f, 0.5f,     0.0f, 1.0f, // first four attributes (position coordinates, texture coordinates)
-        0.5f, -0.5f,     1.0f, 0.0f, // next four
-        -0.5f, -0.5f,    0.0f, 0.0f, // and so ..on
+        -0.5f, 0.5f,     -0.5f, 0.5f, // first four attributes (position coordinates, texture coordinates)
+        0.5f, -0.5f,     0.5f, -0.5f, // next four
+        -0.5f, -0.5f,    -0.5f, -0.5f, // and so ..on
 
-        0.5f, -0.5f,    0.0f, 1.0f,
-        0.5f, 0.5f,     1.0f, 1.0f,
-        -0.5f, 0.5f,    1.0f, 0.0f
+        0.5f, -0.5f,    0.5f, -0.5f,
+        0.5f, 0.5f,     0.5f, 0.5f,
+        -0.5f, 0.5f,    -0.5f, 0.5f
     };
 
 
@@ -106,12 +106,9 @@ void SpriteRenderer::DrawDebug() {
     this->shader.Use();
     
     glm::mat4 model = glm::mat4(1.0f);
-
+    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
+    
     this->shader.SetMatrix4("model", model);
-    // this->shader.SetVector3f("spriteColor", color);
-
-    // glActiveTexture(GL_TEXTURE0);
-    // texture.Bind();
 
     glBindVertexArray(this->quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
