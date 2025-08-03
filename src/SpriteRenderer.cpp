@@ -1,5 +1,5 @@
 #include "SpriteRenderer.h"
-
+#include <iostream>
 
 SpriteRenderer::SpriteRenderer(const Shader& shader)
 {
@@ -24,13 +24,13 @@ void SpriteRenderer::initRenderData()
 
     float vertices[] = {
         // pos      // tex
-        -0.5f, 0.5f,     -0.5f, 0.5f, // first four attributes (position coordinates, texture coordinates)
-        0.5f, -0.5f,     0.5f, -0.5f, // next four
-        -0.5f, -0.5f,    -0.5f, -0.5f, // and so ..on
+        -0.5f, 0.5f,     0.0f, 1.0f, // first four attributes (position coordinates, texture coordinates)
+        0.5f, -0.5f,     1.0f, 0.0f, // next four
+        -0.5f, -0.5f,    0.0f, 0.0f, // and so ..on
 
-        0.5f, -0.5f,    0.5f, -0.5f,
-        0.5f, 0.5f,     0.5f, 0.5f,
-        -0.5f, 0.5f,    -0.5f, 0.5f
+        0.5f, -0.5f,    1.0f, 0.0f,
+        0.5f, 0.5f,     1.0f, 1.0f,
+        -0.5f, 0.5f,    0.0f, 1.0f
     };
 
 
@@ -83,15 +83,19 @@ void SpriteRenderer::DrawSprite(const Texture2D& texture, glm::vec2 position, gl
     glm::mat4 model = glm::mat4(1.0f);
     //Remember: OPERATION APPLIED FIRST IS WRITTEN LAST or CLOSER TO THE VECTOR
     model = glm::translate(model, glm::vec3(position, 0.0f));
-    
-    model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f)); 
-    model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f)); 
-    model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
 
+    // remember that the author used defined vertex coords in the top left quadrant,
+    // leaving (0,0)(origin) as the bottom right corner 
+    // model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f)); 
+    model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f)); 
+    // model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
+
+    // std::cout << "scaling factor: " << size.x << " " << size.y << std::endl; 
     model = glm::scale(model, glm::vec3(size, 1.0f));
+    // model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
 
     this->shader.SetMatrix4("model", model);
-    this->shader.SetVector3f("spriteColor", color);
+    this->shader.SetVector3f("spriteColor", glm::vec3(1.0f));
 
     glActiveTexture(GL_TEXTURE0);
     texture.Bind();
@@ -101,7 +105,7 @@ void SpriteRenderer::DrawSprite(const Texture2D& texture, glm::vec2 position, gl
     glBindVertexArray(0);
 }
 
-void SpriteRenderer::DrawDebug() {
+void SpriteRenderer::DrawDebug(Texture2D texture) {
     //prepare transformation
     this->shader.Use();
     
@@ -109,6 +113,10 @@ void SpriteRenderer::DrawDebug() {
     model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
     
     this->shader.SetMatrix4("model", model);
+    this->shader.SetVector3f("spriteColor", glm::vec3(1.0f));
+
+    glActiveTexture(GL_TEXTURE0);
+    texture.Bind();
 
     glBindVertexArray(this->quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

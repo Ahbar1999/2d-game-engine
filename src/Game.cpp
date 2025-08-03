@@ -6,7 +6,6 @@
 SpriteRenderer* Renderer;
 
 Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(), Width(Width), Height(Height), last_key(0) {
-
 	//Empty for now 
 }
 
@@ -37,7 +36,7 @@ void Game::Init() {
 	//configure shaders
 	// glm::mat4 
 	// std::cout << "aspect ratio" << 1.0 * this->Width / this->Height << std::endl;
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f * this->Width / this->Height, 0.1f, 10.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 0.5f * this->Width / this->Height, 0.1f, 10.0f);
 	// glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
 	
 	// this->mouse_x = 1.0 * Width / 2.0;	
@@ -62,7 +61,7 @@ void Game::Init() {
 	Renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
 
 	ResourceManager::LoadTexture("../Assets/xqxgoblinmode.PNG", true, "demo");
-	ResourceManager::LoadTexture("../Assets/nature-backgrounds/nature_1/origbig.png", true, "background");
+	ResourceManager::LoadTexture("../Assets/nature-backgrounds/nature_1/origbig.png", true, "background", true);
 	ResourceManager::LoadTexture("../Assets/block.png", false, "block");
 	ResourceManager::LoadTexture("../Assets/block_solid.png", false, "block_solid");
 	ResourceManager::LoadTexture("../Assets/paddle.png", true, "paddle");
@@ -100,8 +99,9 @@ void Game::Init() {
 void Game::Render(float dt) {
 	if (this->State == GAME_ACTIVE) {
 		//draw background
-		// Renderer->DrawSprite(ResourceManager::getTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
-		Renderer->DrawDebug();
+		auto bg_tex = ResourceManager::getTexture("background");
+		Renderer->DrawSprite(bg_tex, glm::vec2(0.0f, 0.0f), glm::vec2(1.0f * this->Width/ bg_tex.Width, 1.0f * this->Height / bg_tex.Height), 0.0f);
+		// Renderer->DrawDebug(ResourceManager::getTexture("background"));
 	}
 
 	//draw level

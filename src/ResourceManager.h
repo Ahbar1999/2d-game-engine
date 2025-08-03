@@ -24,9 +24,9 @@ public:
 	static Shader getShader(std::string name);
 	
 	//loads and store a texture object from a image 
-	static Texture2D LoadTexture(const char* file, bool alpha, std::string name);
+	static Texture2D LoadTexture(const char* file, bool alpha, std::string name, bool flip_verticaly=false);
 	
-	static std::vector<Texture2D> LoadTextures(const char *file, uint16_t nrFrames, bool alpha, std::string name);
+	static std::vector<Texture2D> LoadTextures(const char *file, uint16_t nrFrames, bool alpha, std::string name, bool flip_verticaly=false);
 	//retrieves  the shader object 
 	static Texture2D getTexture(std::string name);
 
@@ -43,10 +43,10 @@ private:
 	static Shader loadShaderFromFile(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
 
 	//loads and generates a single 2d texture from a file
-	static Texture2D loadTextureFromFile(const char* file, bool alpha);
+	static Texture2D loadTextureFromFile(const char* file, bool alpha, bool flip_vertically);
 
 	//loads and generates a vector of 2d texture from a file(sprite sheet) 
-	static std::vector<Texture2D> loadAnimationFromFile(const char* file, uint16_t nrFrames, bool alpha);
+	static std::vector<Texture2D> loadAnimationFromFile(const char* file, uint16_t nrFrames, bool alpha, bool flip_vertically);
 };
 
 #endif // !RESOURCE_MANAGER_H

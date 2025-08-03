@@ -10,6 +10,6 @@ uniform vec3 spriteColor;
 void main()
 {
 	//This is the blending configuration we set with glBlendFunc()
-	// color = vec4(spriteColor, 1.0) * texture(image, TexCoords);
-	color = vec4(VertexColor, 1.0);
+	color = vec4(spriteColor, 1.0) * texture(image, TexCoords);
+	// color = vec4(VertexColor, 1.0);
 }

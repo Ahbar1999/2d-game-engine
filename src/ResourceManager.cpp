@@ -19,15 +19,15 @@ Shader ResourceManager::LoadShader(const char* vShaderFile, const char* fShaderF
     return Shaders[name];
 }
 
-Texture2D ResourceManager::LoadTexture(const char* file, bool alpha, std::string name) {
-	Textures[name] = loadTextureFromFile(file, alpha);
+Texture2D ResourceManager::LoadTexture(const char* file, bool alpha, std::string name, bool flip_vertically) {
+	Textures[name] = loadTextureFromFile(file, alpha, flip_vertically);
     return Textures[name];
 }
 
-std::vector<Texture2D> ResourceManager::LoadTextures(const char *file, uint16_t nrFrames, bool alpha, std::string name) {
+std::vector<Texture2D> ResourceManager::LoadTextures(const char *file, uint16_t nrFrames, bool alpha, std::string name, bool flip_vertically) {
     std::cout << "loading textures for: " << name << std::endl;
     // load sprite sheet
-    return Animations[name] = loadAnimationFromFile(file, nrFrames, alpha);
+    return Animations[name] = loadAnimationFromFile(file, nrFrames, alpha, flip_vertically);
 }
 
 Shader ResourceManager::getShader(std::string name)
@@ -98,7 +98,7 @@ Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* 
 }
 
 // frame_size = {width, heighh} of a single frame, nrFrames = number of frames expected in the sprite sheet 
-std::vector<Texture2D> ResourceManager::loadAnimationFromFile(const char* file, uint16_t nrFrames, bool alpha) {
+std::vector<Texture2D> ResourceManager::loadAnimationFromFile(const char* file, uint16_t nrFrames, bool alpha, bool flip_vertically) {
     // load sprite sheet 
     int width, height, nrChannels;
      
@@ -151,7 +151,7 @@ std::vector<Texture2D> ResourceManager::loadAnimationFromFile(const char* file, 
     return textures;
 }
 
-Texture2D ResourceManager::loadTextureFromFile(const char* file, bool alpha) {
+Texture2D ResourceManager::loadTextureFromFile(const char* file, bool alpha, bool flip_vertically) {
     // create texture object
     Texture2D texture;
     if (alpha) {
@@ -160,6 +160,9 @@ Texture2D ResourceManager::loadTextureFromFile(const char* file, bool alpha) {
     }
     // load image
     int width, height, nrChannels;
+    // stbi_set_flip_horizontally_on_load(true);
+    stbi_set_flip_vertically_on_load(flip_vertically);
+
     unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
     // now generate texture
     texture.Generate(width, height, data);
