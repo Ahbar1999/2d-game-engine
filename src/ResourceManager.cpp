@@ -103,6 +103,7 @@ std::vector<Texture2D> ResourceManager::loadAnimationFromFile(const char* file, 
     int width, height, nrChannels;
      
     std::vector<Texture2D> textures;
+    stbi_set_flip_vertically_on_load(flip_vertically);
     unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
     if (data == NULL) {
         std::cerr << "Could not load file: " << std::endl;

@@ -116,10 +116,18 @@ void mouse_cursor_callback(GLFWwindow* window , double xpos, double ypos) {
         first_call =0;
         THEGame.mouse_x = xpos;
         THEGame.mouse_y = ypos;  
-    } 
+    }
+     
     THEGame.mouse_dx = THEGame.mouse_x - xpos;
     THEGame.mouse_dy = THEGame.mouse_y - ypos;
-    // std::cout << THEGame.mouse_dx << ", " << THEGame.mouse_dy << std::endl;
+    if (std::abs(THEGame.mouse_dx) <= 1) {
+        THEGame.mouse_dx = 0;
+    }
+
+    if (std::abs(THEGame.mouse_dy) <= 1) {
+        THEGame.mouse_dy = 0;
+    }
+    
     THEGame.mouse_x = xpos;
     THEGame.mouse_y = ypos;
 }

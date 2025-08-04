@@ -10,11 +10,13 @@ Game::Game(unsigned int Width, unsigned int Height): State(GAME_ACTIVE), Keys(),
 }
 
 // 24 frames per second
-const float animation_fps = 1.0 / 24.0;
+const float animation_fps = 1.0 / 15.0;
 //Initial size of player
 const glm::vec2 PLAYER_SIZE(200.0f, 200.0f);
 //Initial velocity of player
-const float PLAYER_VELOCTIY(500.0f);
+#define PLAYER_VELOCTIY 0.5f
+#define PLAYER_WALK_SPEED 0.25f
+
 Character* Player;
 
 //Initialize variables of Ball object
@@ -36,27 +38,23 @@ void Game::Init() {
 	//configure shaders
 	// glm::mat4 
 	// std::cout << "aspect ratio" << 1.0 * this->Width / this->Height << std::endl;
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 0.5f * this->Width / this->Height, 0.1f, 10.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f* this->Width / this->Height, 0.1f, 10.0f);
 	// glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
 	
-	// this->mouse_x = 1.0 * Width / 2.0;	
-	// this->mouse_y = 1.0 * Height / 2.0;
 	this->camera = Camera();
-
 	// this->camera.rotate(10, 0, 0);
 
 	//Setting sprite shader uniform variables
 	ResourceManager::getShader("sprite").Use().SetInteger("image", 0);
 	ResourceManager::getShader("sprite").SetMatrix4("projection", projection);
 	ResourceManager::getShader("sprite").SetMatrix4("view", camera.getViewMat());
-	// ResourceManager::getShader("sprite").Use().SetMatrix4("view", camera.getViewMat());
 
 	//Setting Particle shader uniform variables
 	ResourceManager::getShader("particle").Use().SetMatrix4("projection", projection);
 	ResourceManager::getShader("particle").SetMatrix4("view", camera.getViewMat());
 	ResourceManager::getShader("particle").SetInteger("sprite", 0);
-	//ResourceManager::getShader("particle").SetVector2f("offset", glm::vec2(0.5, 0));
-	//ResourceManager::getShader("particle").SetVector4f("color", glm::vec4(1));
+	ResourceManager::getShader("particle").SetVector2f("offset", glm::vec2(0.5, 0));
+	ResourceManager::getShader("particle").SetVector4f("color", glm::vec4(1));
 
 	Renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
 
@@ -85,24 +83,19 @@ void Game::Init() {
 	this->Level = 0;
 
 	glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
-	Player = new Character(playerPos, PLAYER_SIZE,  animation_fps);
+	Player = new Character(glm::vec2(0.0f, 0.0f), glm::vec2(0.1f, 0.1f),  animation_fps);
 	glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
 	Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("face"));
 	
 	Particles = new ParticleGenerator(ResourceManager::getShader("particle"), ResourceManager::getTexture("particle"), 500);
-	
-	// just render it at top left we dont care;
-	// auto anim_player_pos = glm::vec2(1.0, 1.0); 	
-	// AnimatedPlayer = new GameObject(anim_player_pos, ANIM_PLAYER_SIZE, ResourceManager::getAnimation("Player_Idle"), animation_fps);	
 }
 
 void Game::Render(float dt) {
-	if (this->State == GAME_ACTIVE) {
-		//draw background
-		auto bg_tex = ResourceManager::getTexture("background");
-		Renderer->DrawSprite(bg_tex, glm::vec2(0.0f, 0.0f), glm::vec2(1.0f * this->Width/ bg_tex.Width, 1.0f * this->Height / bg_tex.Height), 0.0f);
-		// Renderer->DrawDebug(ResourceManager::getTexture("background"));
-	}
+	// if (this->State == GAME_ACTIVE) {
+	//draw background
+	auto bg_tex = ResourceManager::getTexture("background");
+	Renderer->DrawSprite(bg_tex, glm::vec2(0.0f, 0.0f), glm::vec2(1.0f * this->Width/ bg_tex.Width, 1.0f * this->Height / bg_tex.Height), 0.0f);
+	// Renderer->DrawDebug(ResourceManager::getTexture("background"));
 
 	//draw level
 	// this->Levels[this->Level].Draw(*Renderer);
@@ -114,19 +107,22 @@ void Game::Render(float dt) {
 	//Draw ball, in that order
 	// Ball->Draw(*Renderer);
 
-	// Player->Animate(*Renderer, dt);	
+	Player->Animate(*Renderer, dt);
+	// std::cout << Player->Position.x << " " << Player->Position.y << std::endl;
+	// }	
 }
 
 void Game::ProcessInput(float dt) {
-	// std::cout << "mouse: " <<  this->mouse_x << " " << this->mouse_y << std::endl;
+
 	this->camera.rotate(this->mouse_dx, this->mouse_dy, dt);
 	// reset state
 	if (this->State == GAME_ACTIVE) {
 		float velocity = PLAYER_VELOCTIY * dt;
+		float walk_speed= PLAYER_WALK_SPEED * dt; 
 		//move paddle
 		if (this->Keys[GLFW_KEY_A]) {
+			Player->Position.x -= walk_speed;
 			if (Player->Position.x >= 0.0f) {
-				Player->Position.x -= velocity;
 				if (Ball->Stuck)
 					Ball->Position.x -= velocity;
 			}
@@ -139,8 +135,8 @@ void Game::ProcessInput(float dt) {
 			}
 			this->last_key = GLFW_KEY_A;
 		} else if (this->Keys[GLFW_KEY_D]) {
+			Player->Position.x += walk_speed;
 			if (Player->Position.x < this->Width - Player->Size.x) {
-				Player->Position.x += velocity;
 				if (Ball->Stuck)
 					Ball->Position.x += velocity;
 			}
@@ -159,13 +155,13 @@ void Game::ProcessInput(float dt) {
 			}
 			this->last_key = GLFW_KEY_SPACE;
 		} else if (this->Keys[GLFW_KEY_UP]) {
-			this->camera.move_forwards(velocity * dt);
+			this->camera.move_forwards(velocity);
 		} else if (this->Keys[GLFW_KEY_DOWN]) {
-			this->camera.move_backwards(velocity * dt);
+			this->camera.move_backwards(velocity);
 		} else if (this->Keys[GLFW_KEY_LEFT]) {
-			this->camera.move_left(velocity * dt);
+			this->camera.move_left(velocity);
 		} else if (this->Keys[GLFW_KEY_RIGHT]) {
-			this->camera.move_right(velocity * dt);
+			this->camera.move_right(velocity);
 		} else {
 			if (this->last_key != (1 << 16) - 1) {
 				Player->change_state(Character::CharacterState::IDLE);
@@ -306,7 +302,7 @@ void Game::Update(float dt) {
 
 	if (Ball->Position.y >= this->Height) {
 		this->ResetLevel();
-		this->ResetPlayer();
+		// this->ResetPlayer();
 	}
 	// Player->state = Character::CharacterState::IDLE;
 }
@@ -325,7 +321,7 @@ void Game::ResetLevel() {
 
 void Game::ResetPlayer() {
 	//reset ball player stats
-	Player->Size = PLAYER_SIZE;
-	Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
-	Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+	// Player->Size = PLAYER_SIZE;
+	// Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
+	// Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 }

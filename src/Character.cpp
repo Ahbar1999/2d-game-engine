@@ -13,10 +13,10 @@ Character::Character(glm::vec2 pos,
         this->frame_i =0;
 
         // load and store animatinos 
-        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Idle.png", 6, true, "Player_Idle");
-        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Walk.png", 8, true, "Player_Walk");
-        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Attack_1.png", 6, true, "Player_Attack1");
-        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Run.png", 8, true, "Player_Run");
+        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Idle.png", 6, true, "Player_Idle", true);
+        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Walk.png", 8, true, "Player_Walk", true);
+        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Attack_1.png", 6, true, "Player_Attack1", true);
+        ResourceManager::LoadTextures("../Assets/Sprite_Sheets/Player/Run.png", 8, true, "Player_Run", true);
         this->animations.push_back(ResourceManager::getAnimation("Player_Idle"));
         this->animations.push_back(ResourceManager::getAnimation("Player_Run"));
         this->animations.push_back(ResourceManager::getAnimation("Player_Walk"));
