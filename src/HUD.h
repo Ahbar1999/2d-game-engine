@@ -8,6 +8,7 @@
 
 class HUDElement  {
 public:
+    HUDElement();
     HUDElement(glm::vec2& position, glm::vec2& size, Texture2D& texture, glm::vec2& rotation = glm:vec2(0, 0), glm::vec3& color = glm:vec3(1.0));
 
     // 2d object so we only need two dimensions to store position, size etc
@@ -18,7 +19,7 @@ public:
 
     Texture2D texture;
 
-    void Draw(SpriteRenderer* Renderer);
+    virtual void Draw(SpriteRenderer* Renderer);
 };
 
 

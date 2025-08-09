@@ -6,24 +6,19 @@
 #include "InventoryItem.h"
 #include "SpriteRenderer.h"
 
-
+// add a way to draw all the items in an inventory together, like in a enclosing box 
 // add support for equippable inventory items like character skin items
 // add support for consumable inventory items like health items, powerups etc.
-class Invetory {
+class Inventory :HUDElement {   
     Inventory();
 
     std::unordered_map<uint32_t, InventoryItem> Items;
 
-    // calls draw methods for all Invetory Items  
     void Draw(SpriteRenderer* Renderer);
 
-    void AddItem(InventoryItem& item) {
-        this->Items[item->id]  =item; 
-    }
+    void AddItem(InventoryItem& item);
 
-    void RemoveItem() {
-        this->Items.erase(item->id);
-    }
+    void RemoveItem();
 };
 
 

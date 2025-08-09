@@ -5,8 +5,15 @@ Invetory::Inventory() {
 }
 
 Inventory::Draw(SpriteRenderer* Renderer) {
-    for (auto& item: this->items) {
+    for (auto& [item_id, item]: this->Items) {
         item.Draw(Renderer);
     }
 }
 
+Inventory::AddItem(InventoryItem& item) {
+    this->Items[item->id]  =item; 
+}
+
+Inventory::RemoveItem() {
+    this->Items.erase(item->id);
+}
